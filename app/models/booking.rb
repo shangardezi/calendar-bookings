@@ -19,8 +19,8 @@ class Booking < ActiveRecord::Base
   def availability
     return unless room
 
-    bookings = Booking.where('start <= ? AND end >= ?', self.end, start)
-    unless bookings.empty?
+    existing_bookings = Booking.where('start <= ? AND end >= ?', self.end, start)
+    unless existing_bookings.empty?
       errors.add(:base, message: 'an existing booking is taking place during this time')
     end
   end
