@@ -25,6 +25,7 @@ group :development, :test do
   gem 'byebug', platform: :mri
   gem 'rspec-rails', '~> 3.8'
   gem 'pry'
+  gem "factory_bot_rails"
 end
 
 group :development do
