@@ -13,7 +13,7 @@ RSpec.describe Booking, type: :model do
         room = create(:room)
         booking = Booking.new start: '03/02/2019', end: '01/02/2019', room: room
 
-        expect(booking).not_to be_valid
+        expect(booking).to_not be_valid
         expect(booking.errors.messages[:start]).to include 'cannot be after the end date'
         expect(booking.errors.messages[:end]).to include 'cannot be before the start date'
       end
@@ -28,10 +28,56 @@ RSpec.describe Booking, type: :model do
       end
     end
 
-    context 'when start date and end date are the same' do
+    context 'when start and end date are the same' do
       it 'is valid' do
         room = create(:room)
         booking = Booking.new start: '01/02/2019', end: '01/02/2019', room: room
+
+        expect(booking).to be_valid
+      end
+    end
+  end
+
+  describe '#no_colliding_bookings' do
+    context 'when a booking with the same start date exists' do
+      let(:room) { create(:room) }
+      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '02/02/2019', room: room)}
+
+      it 'is not valid' do
+        booking = described_class.new start: '01/02/2019', end: '04/02/2019', room_id: room.id 
+
+        expect(booking).to_not be_valid
+      end
+    end
+
+    context 'when a booking with the same end date exists' do
+      let(:room) { create(:room) }
+      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
+
+      it 'returns a booking conflict error' do
+        booking = described_class.new start: '02/02/2019', end: '04/02/2019', room_id: room.id 
+
+        expect(booking).to_not be_valid
+      end
+    end
+
+    context 'when a booking exists during the duration of another' do
+      let(:room) { create(:room) }
+      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
+
+      it 'returns a booking conflict error' do
+        booking = described_class.new start: '02/02/2019', end: '03/02/2019', room_id: room.id 
+
+        expect(booking).to_not be_valid
+      end
+    end
+
+    context 'when there are no booking conflicts' do
+      let(:room) { create(:room) }
+      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
+
+      it 'returns a booking conflict error' do
+        booking = described_class.new start: '05/02/2019', end: '07/02/2019', room_id: room.id       
 
         expect(booking).to be_valid
       end
