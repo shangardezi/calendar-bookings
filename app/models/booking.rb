@@ -21,7 +21,7 @@ class Booking < ActiveRecord::Base
 
     bookings = Booking.where('start <= ? AND end >= ?', self.end, start)
     unless bookings.empty?
-      errors.add(:base, 'an existing booking is taking place during this time')
+      errors.add(:base, message: 'an existing booking is taking place during this time')
     end
   end
 end

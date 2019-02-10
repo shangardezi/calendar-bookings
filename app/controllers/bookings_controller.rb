@@ -3,14 +3,14 @@ class BookingsController < ApplicationController
     if booking.save 
       render json: { message: 'Booking created.' }, status: :ok
     else
-      render json: { message: booking.errors.full_messages.join('\n') }, status: :unprocessable_entity
+      render json: { message: booking.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
   end
 
   private
 
   def booking
-    @booking = Booking.new(booking_params)
+    @booking ||= Booking.new(booking_params)
   end
 
   def booking_params

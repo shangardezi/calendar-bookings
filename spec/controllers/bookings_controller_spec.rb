@@ -4,56 +4,35 @@ RSpec.describe BookingsController, type: :controller do
   describe '#create' do
     context 'with valid attributes' do
       let(:room) { create(:room) }
+      let(:valid_attrs) { { start: '01/02/2019', end: '04/02/2019', room_id: room.id } }
+
       it 'creates a new booking' do
-        post :create, params: { start: '01/02/2019', end: '04/02/2019', room_id: room.id }
-
-        expect(response.status).to eq 422
-
-        response_body = JSON.parse(response.body)
-        expect(response_body['message']).to eq 'Booking conflicts with an existing booking'
+        expect {
+          post :create, params: valid_attrs
+        }.to change{ Booking.count }.by(1)
       end
-    end
 
-    context 'when a booking with the same end date exists' do
-      let(:room) { create(:room) }
-      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
-
-      it 'returns a booking conflict error' do
-        post :create, params: { start: '02/02/2019', end: '04/02/2019', room_id: room.id }
-
-        expect(response.status).to eq 422
-
-        response_body = JSON.parse(response.body)
-        expect(response_body['message']).to eq 'Booking conflicts with an existing booking'
-      end
-    end
-
-    context 'when a booking exists during the duration of another' do
-      let(:room) { create(:room) }
-      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
-
-      it 'returns a booking conflict error' do
-        post :create, params: { start: '02/02/2019', end: '03/02/2019', room_id: room.id }
-
-        expect(response.status).to eq 422
-
-        response_body = JSON.parse(response.body)
-        expect(response_body['message']).to eq 'Booking conflicts with an existing booking'
-      end
-    end
-
-    context 'when there are no booking conflicts' do
-      let(:room) { create(:room) }
-      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '04/02/2019', room: room) }
-
-      it 'returns a booking conflict error' do
-        post :create, params: { start: '05/02/2019', end: '07/02/2019', room_id: room.id }
+      it 'responds with status code 200' do
+        post :create, params: valid_attrs
 
         expect(response.status).to eq 200
+        expect(JSON.parse(response.body)['message']).to eq 'Booking created.'
+      end
+    end
 
-        response_body = JSON.parse(response.body)
-        expect(response_body['message']).to eq 'Booking created.'
-        expect(Booking.last).to have_attributes(start: Date.parse('05/02/2019'), end: Date.parse('07/02/2019'), room_id: room.id )
+    context 'with invalid attributes' do
+      let(:invalid_attrs) { { start: '02/02/2019', end: '04/02/2019', room_id: 999 } }
+
+      it 'does not create a booking' do
+        expect {
+          post :create, params: invalid_attrs
+        }.to_not change { Booking.count }
+      end
+
+      it 'responds with status code 422' do
+        post :create, params: invalid_attrs
+
+        expect(response.status).to eq 422
       end
     end
   end
