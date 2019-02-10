@@ -1,9 +1,9 @@
 class Booking < ActiveRecord::Base
   validate :start_date_is_before_end_date, :availability
+
   validates_presence_of :start, :end, :room
 
   belongs_to :room
-
 
   private
 
@@ -19,7 +19,7 @@ class Booking < ActiveRecord::Base
   def availability
     return unless room
 
-    bookings = Booking.where('start <= ? AND end >= ?', self.end, self.start)
+    bookings = Booking.where('start <= ? AND end >= ?', self.end, start)
     unless bookings.empty?
       errors.add(:base, 'an existing booking is taking place during this time')
     end

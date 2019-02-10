@@ -2,11 +2,9 @@ require 'rails_helper'
 
 RSpec.describe BookingsController, type: :controller do
   describe '#create' do
-    context 'when a booking with the same start date exists' do
+    context 'with valid attributes' do
       let(:room) { create(:room) }
-      let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '02/02/2019', room: room)}
-
-      it 'returns a booking conflict error' do
+      it 'creates a new booking' do
         post :create, params: { start: '01/02/2019', end: '04/02/2019', room_id: room.id }
 
         expect(response.status).to eq 422

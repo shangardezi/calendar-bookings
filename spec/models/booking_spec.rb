@@ -38,7 +38,7 @@ RSpec.describe Booking, type: :model do
     end
   end
 
-  describe '#no_colliding_bookings' do
+  describe '#availability' do
     context 'when a booking with the same start date exists' do
       let(:room) { create(:room) }
       let!(:existing_booking) { create(:booking, start: '01/02/2019', end: '02/02/2019', room: room)}
