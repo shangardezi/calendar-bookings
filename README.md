@@ -16,7 +16,6 @@ Good luck!
 - Installed RSpec as the testing framework.
 - Installed FactoryBot to use factories instead of fixtures.
 - Installed shoulda_matchers for helpful RSpec matchers. e.g `should validate_presence_of`
-- The solution is also available in a (GitHub Repo)[https://github.com/shangardezi/calendar-bookings] (it's private repo so access needs to be granted).
 
 Design choices:
 - Validations were moved to the Booking model. Currently, as the model is simple and small this is sufficient. However, if more validations were to bloat the model, we could extract these into a seperate validator object.
